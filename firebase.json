@@ -1,0 +1,10 @@
+{
+  "firebase": "trolltext",
+  "public": ".",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**",
+    "**/TrollText/**"
+  ]
+}

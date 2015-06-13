@@ -1,0 +1,41 @@
+<!doctype html>
+<HTML lang="eng">
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="https://cdn.firebase.com/js/client/2.2.7/firebase.js"></script>
+	</head>
+	<body>
+		<div>
+			<h2>Add New Fact</h2>
+			<input type="text" placeholder="Type" id="type"/><br>
+			Fact Text<br>
+			<textarea id="fact" rows="4" cols="50"></textarea>
+			<button id="send" type="button">Add</button>
+		</div><br><br>
+		<table border="1" id="prev-facts">
+			<tr>
+				<th>Type</th>
+				<th>Text</th>
+			</tr>
+		</table>
+		<script>
+			$(document).ready(function(){	
+				var ref = new Firebase("https://trolltext.firebaseio.com/facts");
+				
+				$("#send").click(function(){
+					ref.push({fact: $("#fact").val(), type: $("#type").val()});
+				});
+			
+				ref.on("child_added", function(snap){
+					var type = $("<td>");
+					type.text(snap.val().type);
+					
+					var fact =  $("<td>");
+					fact.text(snap.val().fact);
+					
+					$("#prev-facts").append($("<tr>").append(type).append(fact));
+				});
+			});	
+		</script>
+	</body>	
+</HTML>
