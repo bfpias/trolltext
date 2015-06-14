@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var example = angular.module('starter', ['ionic', 'ngCordova'])
+var app = angular.module('starter', ['ionic', 'ngCordova'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -21,18 +21,55 @@ var example = angular.module('starter', ['ionic', 'ngCordova'])
   });
 });
 
-example.controller("ExampleController", function($scope, $cordovaContacts) {
+app.config(function($stateProvider, $urlRouterProvider) {
+  $urlRouterProvider.otherwise('/')
+
+  $stateProvider.state('home', {
+    url: '/',
+    templateUrl: 'templates/home.html'
+  })
+  
+  $stateProvider.state('contact', {
+    url: '/contact',
+    templateUrl: 'templates/contact.html'
+  })
+  
+})
+
+app.controller("AppCtrl", function($scope, $state, $cordovaContacts) {
  
   $scope.getContactList = function() {
-      $cordovaContacts.find({filter: ''}).then(function(result) {
-        $scope.contacts = result;
-    }, function(error) {
-        console.log("ERROR: " + error);
-    }); 
+	  
+	  $state.go('contact');
+	  
+	  navigator.contacts.pickContact(function(contact){
+		console.log('The following contact has been selected:' + JSON.stringify(contact.phoneNumbers));
+		$scope.contactName = getName(contact);	
+		$scope.contacts = contact.phoneNumbers;
+		$scope.$apply();
+	},function(err){
+		console.log('Error: ' + err);
+	});
   }
 
-  $scope.processContact = function($contact) {
-    alert($contact.phoneNumbers[0]['value']);
+  $scope.processContact = function(number, name) {
+	$scope.messages.(number + " " + name);
+	$state.go('home');
   }
+  
 
+}).filter('capitalize', function() {
+    return function(input, all) {
+      return (!!input) ? input.replace(/([^\W_]+[^\s-]*) */g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}) : '';
+    }
 });
+
+function getName(c) {
+	var name = c.displayName;
+	if(!name || name === "") {
+		if(c.name.formatted) return c.name.formatted;
+		if(c.name.givenName && c.name.familyName) return c.name.givenName +" "+c.name.familyName;
+		return "Nameless";
+	}
+	return name;
+}

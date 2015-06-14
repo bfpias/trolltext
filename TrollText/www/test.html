@@ -1,0 +1,31 @@
+<!doctype html>
+<HTML lang="eng">
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="https://cdn.firebase.com/js/client/2.2.7/firebase.js"></script>
+		<script src="troll.js"></script>
+	</head>
+	<body>
+		<textarea id="text"></textarea><br>
+		<button id="send" type="button">Send Message</button>
+		<script>
+			$(document).ready(function(){	
+				var ref = new Firebase("https://trolltext.firebaseio.com/");
+				var troll = Troll(ref);
+				var mynumber = "1234567890";
+				var number = "0987654321";
+				
+				function send_sms(text){
+					console.log(text)
+				};
+				
+				troll.get_suggestions(number, mynumber, $("#text"));
+				
+				$("#send").click(function(){
+					troll.send_message($("#text").val(), number, mynumber, send_sms);
+				});
+				
+			});	
+		</script>
+	</body>	
+</HTML>
