@@ -5,8 +5,8 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var app = angular.module('starter', ['ionic', 'ngCordova'])
 
+var app = angular.module('starter', ['ionic', 'ngCordova', 'firebase'])
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -34,16 +34,27 @@ app.config(function($stateProvider, $urlRouterProvider) {
     templateUrl: 'templates/contact.html'
   })
   
+  $stateProvider.state('send_message', {
+    url: '/send_message',
+    templateUrl: 'templates/send_message.html'
+  })
+  
 })
 
-app.controller("AppCtrl", function($scope, $state, $cordovaContacts) {
+app.controller("AppCtrl", function($scope, $state, $cordovaContacts, $cordovaDevice, $firebaseObject) {
+document.addEventListener("deviceready", function () {
 
+  var ref = new Firebase("https://trolltext.firebaseio.com/");
+  var troll = Troll(ref);
+  var uuid = $cordovaDevice.getPlatform() + $cordovaDevice.getUUID();
+
+  $scope.messages = $firebaseObject(ref.child('messages').child(uuid));
+    
   $scope.getContactList = function() {
 	  
 	  $state.go('contact');
 	  
 	  navigator.contacts.pickContact(function(contact){
-		console.log('The following contact has been selected:' + JSON.stringify(contact.phoneNumbers));
 		$scope.contactName = getName(contact);	
 		$scope.contacts = contact.phoneNumbers;
 		$scope.$apply();
@@ -53,16 +64,41 @@ app.controller("AppCtrl", function($scope, $state, $cordovaContacts) {
   }
 
   $scope.processContact = function(number, name) {
-	$state.go('home');
-  sendSMS(number, name);
+	$scope.number = number;
+	$scope.name = name;
+	troll.get_suggestions($scope);
+	$state.go('send_message');
   }
   
-
+  $scope.sendMessage = function() {
+	  troll.send_message($scope.messageToSend, $scope.number, $scope.name, uuid, sendSMS);
+	  $state.go('home');
+  }
+  
+});
 }).filter('capitalize', function() {
     return function(input, all) {
       return (!!input) ? input.replace(/([^\W_]+[^\s-]*) */g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}) : '';
     }
-});
+}).filter('myLimitTo', [function(){
+    return function(obj, limit){
+        var keys = Object.keys(obj);
+        if(keys.length < 1){
+            return [];
+        }
+
+        var ret = new Object,
+        count = 0;
+        angular.forEach(keys, function(key, arrayIndex){
+            if(count >= limit){
+                return false;
+            }
+            ret[key] = obj[key];
+            count++;
+        });
+        return ret;
+    };
+}]);
 
 function getName(c) {
 	var name = c.displayName;
@@ -75,9 +111,9 @@ function getName(c) {
 }
 
 function sendSMS(number, text){
-        SMS.sendSMS(number, text, function(){console.log("Succesfully sent msg " + text + "to: " number)}, 
+        SMS.sendSMS(number, text, function(){console.log("Succesfully sent msg " + text + "to: " + number)}, 
                     function(str){console.log("Error while sendimg msg: " + str);})
-      }
+}
 
 // TODO: On app startup, we should list latest SMS and see if any were responses to previous msgs. 
 // Ideally the app should be a service running on the background. To be implemented later...
@@ -87,13 +123,13 @@ function listSMS(){
 
 // TODO: Change event listener to report to the app/firebase for response processing
 function startWatch(){ 
-                      SMS.startWatch(function(){
-                              console.log('watching', 'watching started');
-                              document.addEventListener('onSMSArrive', function(e){
-                                      var sms = e.data;
-                                      console.log('SMS arrived, content: ' + JSON.stringify( sms ));
-                              });
-                      }, function(){
-                              console.log('failed to start watching');
-                         });
-                      }
+  SMS.startWatch(function(){
+		  console.log('watching', 'watching started');
+		  document.addEventListener('onSMSArrive', function(e){
+				  var sms = e.data;
+				  console.log('SMS arrived, content: ' + JSON.stringify( sms ));
+		  });
+  }, function(){
+		  console.log('failed to start watching');
+	 });
+}

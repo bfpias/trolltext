@@ -4,10 +4,14 @@ window.Troll = function (firebaseRef) {
 		
 		ref: firebaseRef,
 		
+		my_conversations: function($scope){
+			
+		},
+		
 		//send message will add the message to the
 		//queue to be sent out, and will get a message
 		//from the queue and send it from this device
-		send_message: function(message, number, mynumber, send_sms){
+		send_message: function(message, number, friend_name, uuid, send_sms){
 			splits = message.match(/.{1,160}/g);
 			console.log(splits);
 			var num = splits.length;
@@ -15,11 +19,11 @@ window.Troll = function (firebaseRef) {
 			//Scope fix
 			that = this;
 			
-			that.get_message(send_sms, num, mynumber, function(){
+			that.get_message(send_sms, num, uuid, function(){
 				console.log("Callback");
 				for (var i = 0; i < num; i++){
-					that.ref.child("to_send").push({message:splits[i], number:number, mynumber:mynumber});
-					that.ref.child("messages").child(mynumber).child(number).push({message:splits[i], number:number, mynumber:mynumber});
+					that.ref.child("to_send").push({message:splits[i], number:number, uuid:uuid, friend_name: friend_name});
+					that.ref.child("messages").child(uuid).child(number).push({message:splits[i], number:number, friend_name: friend_name});
 				}
 			});
 			return num;
@@ -28,7 +32,7 @@ window.Troll = function (firebaseRef) {
 		//get_message will pull a message from Firebase
 		//and will send the message using the send_sms function
 		//that is passed in, then run the callback
-		get_message: function(send_sms, num, mynumber, callback){
+		get_message: function(send_sms, num, uuid, callback){
 			var processed = 0;
 			
 			for (var i = 0; i < num; i++){
@@ -45,9 +49,9 @@ window.Troll = function (firebaseRef) {
 					if (x > 0) {
 						that.ref.child("to_send").limitToFirst(1).once("child_added", function(snap){
 							//Make sure we don't send our own text
-							if(snap.val().mynumber != mynumber){
+							if(snap.val().uuid != uuid){
 								//Send the SMS from this device
-								send_sms(snap.val());
+								send_sms(snap.val().number, snap.val().message);
 								//Remove message from queue
 								that.ref.child("to_send").child(snap.key()).remove()
 							}
@@ -73,7 +77,7 @@ window.Troll = function (firebaseRef) {
 			
 		},
 		
-		get_suggestions: function(number, mynumber, suggestionDiv){
+		get_suggestions: function($scope){
 			
 			function fetch_random(obj) {
 				var temp_key, keys = [];
@@ -93,9 +97,8 @@ window.Troll = function (firebaseRef) {
 				var fact = fetch_random(facts.val()).fact;
 				
 				that.ref.child("actions").once("value", function(actions){
-	
-					suggestionDiv.val(fact + " " + fetch_random(actions.val()).action);
-					
+					$scope.messageToSend = (fact + " " + fetch_random(actions.val()).action);
+					$scope.$apply();
 				});
 			});
 			

@@ -1,4 +1,4 @@
-all: android contacts sms
+all: android contacts sms device
 
 android:
 	ionic platform add android
@@ -8,3 +8,6 @@ contacts:
 
 sms:
 	cordova plugin add cordova-plugin-sms
+	
+device:
+	cordova plugin add org.apache.cordova.device

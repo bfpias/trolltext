@@ -4,4 +4,12 @@
 		<h1 class="title">trollText</h1>
 		<button class="button icon-left ion-plus-circled" ng-click="getContactList()"></button>
 	</ion-header-bar>
+	<ion-content>
+		<div class="card" ng-repeat="message in messages">
+			<div class="item item-text-wrap" ng-repeat="name in message | myLimitTo:1">
+				<h1>{{name.friend_name}}</h1><br>
+				<h2>{{name.number}}</h2>
+			</div>
+		</div>
+	</ion-content>
 </ion-pane>
