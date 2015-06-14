@@ -27,21 +27,27 @@ app.config(function($stateProvider, $urlRouterProvider) {
   $stateProvider.state('home', {
     url: '/',
     templateUrl: 'templates/home.html'
-  })
+  });
   
   $stateProvider.state('contact', {
     url: '/contact',
     templateUrl: 'templates/contact.html'
-  })
+  });
   
   $stateProvider.state('send_message', {
     url: '/send_message',
     templateUrl: 'templates/send_message.html'
-  })
+  });
+  
+  $stateProvider.state('chat', {
+    url: '/chat',
+    templateUrl: 'templates/chat.html'
+  });
+  
   
 })
 
-app.controller("AppCtrl", function($scope, $state, $cordovaContacts, $cordovaDevice, $firebaseObject) {
+app.controller("AppCtrl", function($scope, $state, $cordovaContacts, $cordovaDevice, $ionicHistory, $firebaseObject) {
 document.addEventListener("deviceready", function () {
 
   var ref = new Firebase("https://trolltext.firebaseio.com/");
@@ -72,8 +78,19 @@ document.addEventListener("deviceready", function () {
   
   $scope.sendMessage = function() {
 	  troll.send_message($scope.messageToSend, $scope.number, $scope.name, uuid, sendSMS);
-	  $state.go('home');
+	  $$scope.goHome();
   }
+  
+  $scope.getMessages = function(number, friend_name) {
+	$scope.chat = $firebaseObject(ref.child('messages').child(uuid).child(number));
+	$scope.chat_name = friend_name;
+	$state.go('chat');	  
+ }
+ 
+ $scope.goHome = function() {
+	 $state.go('home');
+	 //$ionicHistory.clearHistory();
+ }
   
 });
 }).filter('capitalize', function() {

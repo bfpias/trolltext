@@ -1,1 +1,21 @@
-/* Empty. Add your own CSS if you like */
+.messages{
+	margin:5px;
+}
+
+.message{
+	width:70%;
+	background-color:#0c63ee;
+	border-color: #0c63ee;
+	border-radius: 2px;
+	border: 1px solid;
+	color:#fff;
+	float:right;
+	padding:5px;
+}
+
+.from{
+	background-color:#e5e5e5 !important;
+	border-color: #a2a2a2 !important;
+	color:#444 !important;
+	float:left !important;
+}

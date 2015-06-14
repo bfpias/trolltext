@@ -1,4 +1,4 @@
-all: android contacts sms device
+all: android contacts sms device whitelist
 
 android:
 	ionic platform add android
@@ -11,3 +11,6 @@ sms:
 	
 device:
 	cordova plugin add org.apache.cordova.device
+	
+whitelist:
+	cordova plugin add cordova-plugin-whitelist

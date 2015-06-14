@@ -4,10 +4,6 @@ window.Troll = function (firebaseRef) {
 		
 		ref: firebaseRef,
 		
-		my_conversations: function($scope){
-			
-		},
-		
 		//send message will add the message to the
 		//queue to be sent out, and will get a message
 		//from the queue and send it from this device
@@ -23,7 +19,7 @@ window.Troll = function (firebaseRef) {
 				console.log("Callback");
 				for (var i = 0; i < num; i++){
 					that.ref.child("to_send").push({message:splits[i], number:number, uuid:uuid, friend_name: friend_name});
-					that.ref.child("messages").child(uuid).child(number).push({message:splits[i], number:number, friend_name: friend_name});
+					that.ref.child("messages").child(uuid).child(number).push({message:splits[i], number:number, friend_name: friend_name, type: "to"});
 				}
 			});
 			return num;
