@@ -80,7 +80,7 @@ function sendSMS(number, text){
       }
 
 // TODO: On app startup, we should list latest SMS and see if any were responses to previous msgs. 
-// Ideally the app should be a service. To be implemented later...
+// Ideally the app should be a service running on the background. To be implemented later...
 function listSMS(){
                     if(SMS) SMS.listSMS({}, function(data){})
                   }
