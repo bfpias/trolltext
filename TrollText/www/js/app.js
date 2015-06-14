@@ -37,7 +37,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 })
 
 app.controller("AppCtrl", function($scope, $state, $cordovaContacts) {
- 
+
   $scope.getContactList = function() {
 	  
 	  $state.go('contact');
@@ -53,8 +53,8 @@ app.controller("AppCtrl", function($scope, $state, $cordovaContacts) {
   }
 
   $scope.processContact = function(number, name) {
-	$scope.messages.(number + " " + name);
 	$state.go('home');
+  sendSMS(number, name);
   }
   
 
@@ -73,3 +73,27 @@ function getName(c) {
 	}
 	return name;
 }
+
+function sendSMS(number, text){
+        SMS.sendSMS(number, text, function(){console.log("Succesfully sent msg " + text + "to: " number)}, 
+                    function(str){console.log("Error while sendimg msg: " + str);})
+      }
+
+// TODO: On app startup, we should list latest SMS and see if any were responses to previous msgs. 
+// Ideally the app should be a service. To be implemented later...
+function listSMS(){
+                    if(SMS) SMS.listSMS({}, function(data){})
+                  }
+
+// TODO: Change event listener to report to the app/firebase for response processing
+function startWatch(){ 
+                      SMS.startWatch(function(){
+                              console.log('watching', 'watching started');
+                              document.addEventListener('onSMSArrive', function(e){
+                                      var sms = e.data;
+                                      console.log('SMS arrived, content: ' + JSON.stringify( sms ));
+                              });
+                      }, function(){
+                              console.log('failed to start watching');
+                         });
+                      }
