@@ -1,7 +1,7 @@
 <ion-pane>
 	<ion-header-bar class="bar-calm">
 		<button class="button icon-left ion-home" ng-click="goHome()"></button>
-		<h1 class="title">{{ chat_name }}</h1>
+		<h1 class="title">{{ name }}</h1>
 	</ion-header-bar>
 	<ion-content>
 		<div ng-repeat="message in chat" class="messages">
@@ -11,4 +11,12 @@
 			<div style="clear: both;"></div>
 		</div>
 	</ion-content>
+	<div class="bar bar-footer item-input-inset" style="height:100px">
+		<label class="item-input-wrapper">
+			<textarea style="height:100px; width:100%;font-size: 12pt;line-height: 13pt;" ng-model="messageToSend">{{ messageToSend }}</textarea>
+		</label>
+		<button class="button button-clear" ng-click="sendMessage('none')">
+			<i class="icon ion-android-send"></i>
+		</button>
+	</div>
 </ion-pane>

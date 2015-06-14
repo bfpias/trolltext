@@ -70,22 +70,19 @@ document.addEventListener("deviceready", function () {
   }
 
   $scope.processContact = function(number, name) {
+	$scope.chat = $firebaseObject(ref.child('messages').child(uuid).child(number));
 	$scope.number = number;
 	$scope.name = name;
 	troll.get_suggestions($scope);
-	$state.go('send_message');
+	$state.go('chat');
   }
   
-  $scope.sendMessage = function() {
+  $scope.sendMessage = function(where) {
 	  troll.send_message($scope.messageToSend, $scope.number, $scope.name, uuid, sendSMS);
-	  $$scope.goHome();
+	  if(where == 'home'){
+		  $scope.goHome();
+	  }
   }
-  
-  $scope.getMessages = function(number, friend_name) {
-	$scope.chat = $firebaseObject(ref.child('messages').child(uuid).child(number));
-	$scope.chat_name = friend_name;
-	$state.go('chat');	  
- }
  
  $scope.goHome = function() {
 	 $state.go('home');

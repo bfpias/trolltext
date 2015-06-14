@@ -6,7 +6,7 @@
 	</ion-header-bar>
 	<ion-content>
 		<div ng-repeat="message in messages">
-			<div class="card" ng-repeat="name in message | myLimitTo:1" ng-click="getMessages('{{ name.number }}', '{{name.friend_name}}')">
+			<div class="card" ng-repeat="name in message | myLimitTo:1" ng-click="processContact('{{ name.number }}', '{{name.friend_name}}')">
 				<div class="item item-text-wrap">
 					<h1>{{name.friend_name}}</h1><br>
 					<h2>{{name.number}}</h2>
