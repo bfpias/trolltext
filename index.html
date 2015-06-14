@@ -1,0 +1,74 @@
+<!doctype html>
+<HTML lang="eng">
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="https://cdn.firebase.com/js/client/2.2.7/firebase.js"></script>
+	</head>
+	<body>
+		<div>
+			<h2>Add New Action</h2>
+			Action Text<br>
+			<textarea id="action" rows="4" cols="50"></textarea><br>
+			Response Text<br>
+			<textarea id="action_response" rows="4" cols="50"></textarea><br>
+			<button id="send_action" type="button">Add</button>
+		</div><br><br>
+		<table border="1" id="prev-actions">
+			<tr>
+				<th>Action</th>
+				<th>Response</th>
+			</tr>
+		</table>
+		<br><br>
+		<div>
+			<h2>Add New Fact</h2>
+			<input type="text" placeholder="Type" id="type"/><br>
+			Fact Text<br>
+			<textarea id="fact" rows="4" cols="50"></textarea><br>
+			<button id="send_fact" type="button">Add</button>
+		</div><br><br>
+		<table border="1" id="prev-facts">
+			<tr>
+				<th>Type</th>
+				<th>Text</th>
+			</tr>
+		</table>
+		<script>
+			$(document).ready(function(){	
+				var ref = new Firebase("https://trolltext.firebaseio.com/");
+				
+				$("#send_fact").click(function(){
+					ref.child("facts").push({fact: $("#fact").val(), type: $("#type").val()});
+				});
+			
+				ref.child("facts").on("child_added", function(snap){
+					var type = $("<td>");
+					type.text(snap.val().type);
+					
+					var fact =  $("<td>");
+					fact.text(snap.val().fact);
+					
+					$("#prev-facts").append($("<tr>").append(type).append(fact));
+				});
+				
+				
+				$("#send_action").click(function(){
+					ref.child("actions").push({action: $("#action").val(), action_response:$("#action_response").val()});
+				});
+			
+				ref.child("actions").on("child_added", function(snap){
+					
+					var action =  $("<td>");
+					action.text(snap.val().action);
+					
+					var action_response =  $("<td>");
+					action_response.text(snap.val().action_response);
+					
+					$("#prev-actions").append($("<tr>").append(action).append(action_response));
+				});
+				
+				
+			});	
+		</script>
+	</body>	
+</HTML>
