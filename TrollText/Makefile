@@ -1,4 +1,4 @@
-all: android contacts sms device whitelist
+all: android contacts sms device whitelist splashscreen
 
 android:
 	ionic platform add android
@@ -14,3 +14,6 @@ device:
 	
 whitelist:
 	cordova plugin add cordova-plugin-whitelist
+
+splashscreen:
+	cordova plugin add cordova-plugin-splashscreen

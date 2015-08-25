@@ -2,20 +2,60 @@
 	margin:5px;
 }
 
-.message{
-	width:70%;
-	background-color:#0c63ee;
-	border-color: #0c63ee;
-	border-radius: 2px;
-	border: 1px solid;
-	color:#fff;
-	float:right;
-	padding:5px;
+.message 
+{
+position: relative;
+width: 250px;
+min-height: 20px;
+padding: 5px;
+background: #7DC0FF;
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+border: #7F7F7F solid 3px;
+float:right;
 }
 
-.from{
-	background-color:#e5e5e5 !important;
-	border-color: #a2a2a2 !important;
-	color:#444 !important;
-	float:left !important;
+.from 
+{
+position: relative;
+width: 250px;
+min-height: 20px;
+padding: 5px;
+background: #FF9E72;
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+border: #7F7F7F solid 3px;
+float:left;
+}
+
+.button-float{
+  height: 50px;
+  background: #ef473a !important;
+  color:white !important;
+  z-index: 12 !important;
+  position: absolute !important; 
+  bottom: 15px !important;
+  right: 15px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transition: 0.2s linear !important;
+  transition: 0.2s linear !important;
+  -webkit-transition-property: -webkit-transform, all !important;
+  transition-property: transform, all !important;
+
+}
+
+.button-float:hover{
+  -webkit-transform: translate3d(0, -1px, 0)  !important;
+  transform: translate3d(0, -1px, 0) !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4) !important;
+    background: darken($assertive, 10%) !important;
+}
+
+.padding>div{
+	padding-bottom: 100px;
 }

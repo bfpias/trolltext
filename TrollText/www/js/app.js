@@ -34,11 +34,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
     templateUrl: 'templates/contact.html'
   });
   
-  $stateProvider.state('send_message', {
-    url: '/send_message',
-    templateUrl: 'templates/send_message.html'
-  });
-  
   $stateProvider.state('chat', {
     url: '/chat',
     templateUrl: 'templates/chat.html'
@@ -48,48 +43,41 @@ app.config(function($stateProvider, $urlRouterProvider) {
 })
 
 app.controller("AppCtrl", function($scope, $state, $cordovaContacts, $cordovaDevice, $ionicHistory, $firebaseObject) {
-document.addEventListener("deviceready", function () {
+  document.addEventListener("deviceready", function () {
 
-  var ref = new Firebase("https://trolltext.firebaseio.com/");
-  var troll = Troll(ref);
-  var uuid = $cordovaDevice.getPlatform() + $cordovaDevice.getUUID();
+    var ref = new Firebase("https://trolltext.firebaseio.com/");
+    var troll = Troll(ref);
+    var uuid = $cordovaDevice.getPlatform() + $cordovaDevice.getUUID();
 
-  $scope.messages = $firebaseObject(ref.child('messages').child(uuid));
+    $scope.messages = $firebaseObject(ref.child('messages').child(uuid));
+      
+    $scope.getContactList = function() {
+  	  	  
+  	  navigator.contacts.pickContact(function(contact){
+  		$scope.contactName = getName(contact);	
+  		$scope.contacts = contact.phoneNumbers;
+  		$scope.$apply();
+      $state.go('contact');
+  	},function(err){
+      $state.go('home');
+  	});
+    }
+
+    $scope.processContact = function(number, name) {
+  	$scope.chat = $firebaseObject(ref.child('messages').child(uuid).child(number));
+  	$scope.number = number;
+  	$scope.name = name;
+  	troll.get_suggestions($scope);
+  	$state.go('chat');
+    }
     
-  $scope.getContactList = function() {
-	  
-	  $state.go('contact');
-	  
-	  navigator.contacts.pickContact(function(contact){
-		$scope.contactName = getName(contact);	
-		$scope.contacts = contact.phoneNumbers;
-		$scope.$apply();
-	},function(err){
-		console.log('Error: ' + err);
-	});
-  }
+    $scope.sendMessage = function(where) {
+  	  troll.send_message($scope.messageToSend, $scope.number, $scope.name, uuid, sendSMS);
+  		$state.go(where);
+    }
+    
+  });
 
-  $scope.processContact = function(number, name) {
-	$scope.chat = $firebaseObject(ref.child('messages').child(uuid).child(number));
-	$scope.number = number;
-	$scope.name = name;
-	troll.get_suggestions($scope);
-	$state.go('chat');
-  }
-  
-  $scope.sendMessage = function(where) {
-	  troll.send_message($scope.messageToSend, $scope.number, $scope.name, uuid, sendSMS);
-	  if(where == 'home'){
-		  $scope.goHome();
-	  }
-  }
- 
- $scope.goHome = function() {
-	 $state.go('home');
-	 //$ionicHistory.clearHistory();
- }
-  
-});
 }).filter('capitalize', function() {
     return function(input, all) {
       return (!!input) ? input.replace(/([^\W_]+[^\s-]*) */g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}) : '';
