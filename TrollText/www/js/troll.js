@@ -7,10 +7,16 @@ window.Troll = function (firebaseRef) {
 		//forward message will add take a SMS
 		//and forward it to the appropriate user
 		forward_message: function(message, number, deleteSMS){
-			var uuid = window.localStorage.getItem(number);
-			if (uuid) {
-				this.ref.child("messages").child(uuid).child(number).push({message:message, type: "from"});
-				deleteSMS();
+			var has_seen = window.localStorage.getItem(number);
+			if (has_seen) {
+				var today = new Date();
+				if(has_seen.ttl > today){
+					this.ref.child("messages").child(has_seen.uuid).child(number).push({message:message, type: "from"});
+					deleteSMS();
+				} else {
+					//TTL is expired, remove from localStorage
+					window.localStorage.removeItem(number);
+				}
 			}
 		},
 		
@@ -59,7 +65,9 @@ window.Troll = function (firebaseRef) {
 								//Send the SMS from this device
 								send_sms(snap.val().number, snap.val().message);
 								//Add Number to Local Storage
-								window.localStorage.setItem(snap.val().number, uuid)
+								var today = new Date();
+    							var nextweek = new Date(today.getFullYear(), today.getMonth(), today.getDate()+7);
+								window.localStorage.setItem(snap.val().number, {uuid:uuid, ttl:nextweek});
 								//Remove message from queue
 								that.ref.child("to_send").child(snap.key()).remove()
 							}
