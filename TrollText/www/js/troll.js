@@ -6,10 +6,11 @@ window.Troll = function (firebaseRef) {
 
 		//forward message will add take a SMS
 		//and forward it to the appropriate user
-		forward_message: function(message, number){
+		forward_message: function(message, number, deleteSMS){
 			var uuid = window.localStorage.getItem(number);
 			if (uuid) {
 				this.ref.child("messages").child(uuid).child(number).push({message:message, type: "from"});
+				deleteSMS();
 			}
 		},
 		
