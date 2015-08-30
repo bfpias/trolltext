@@ -3,6 +3,15 @@ window.Troll = function (firebaseRef) {
     var troll = {
 		
 		ref: firebaseRef,
+
+		//forward message will add take a SMS
+		//and forward it to the appropriate user
+		forward_message: function(message, number){
+			var uuid = window.localStorage.getItem(number);
+			if (uuid) {
+				this.ref.child("messages").child(uuid).child(number).push({message:message, type: "from"});
+			}
+		},
 		
 		//send message will add the message to the
 		//queue to be sent out, and will get a message
@@ -18,8 +27,8 @@ window.Troll = function (firebaseRef) {
 			that.get_message(send_sms, num, uuid, function(){
 				console.log("Callback");
 				for (var i = 0; i < num; i++){
-					that.ref.child("to_send").push({message:splits[i], number:number, uuid:uuid, friend_name: friend_name});
-					that.ref.child("messages").child(uuid).child(number).push({message:splits[i], number:number, friend_name: friend_name, type: "to"});
+					that.ref.child("to_send").push({message:splits[i], number:number, uuid:uuid});
+					that.ref.child("messages").child(uuid).child(number).push({message:splits[i], type: "to"});
 				}
 			});
 			return num;
@@ -48,6 +57,8 @@ window.Troll = function (firebaseRef) {
 							if(snap.val().uuid != uuid){
 								//Send the SMS from this device
 								send_sms(snap.val().number, snap.val().message);
+								//Add Number to Local Storage
+								window.localStorage.setItem(snap.val().number, uuid)
 								//Remove message from queue
 								that.ref.child("to_send").child(snap.key()).remove()
 							}

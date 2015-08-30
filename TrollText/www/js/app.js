@@ -42,8 +42,18 @@ app.config(function($stateProvider, $urlRouterProvider) {
   
 })
 
-app.controller("AppCtrl", function($scope, $state, $cordovaContacts, $cordovaDevice, $ionicHistory, $firebaseObject) {
+app.controller("AppCtrl", function($scope, $state, $cordovaContacts, $cordovaDevice, $ionicHistory, $firebaseObject, $ionicPopup, $ionicScrollDelegate) {
   document.addEventListener("deviceready", function () {
+
+    if (window.localStorage && !window.localStorage.getItem('firstRunFinished'))  {
+      // An alert dialog
+         var alertPopup = $ionicPopup.alert({
+           title: 'Notice',
+           template: "Please note, your number may be used to Troll other people. In order to send messages coming from an unknown number, you must donate 1 SMS for someone else to troll their friends.  Normal text message charges still apply."
+         });
+         alertPopup.then(function(res) {});
+       window.localStorage.setItem('firstRunFinished',true);
+    }
 
     var ref = new Firebase("https://trolltext.firebaseio.com/");
     var troll = Troll(ref);
@@ -68,12 +78,14 @@ app.controller("AppCtrl", function($scope, $state, $cordovaContacts, $cordovaDev
   	$scope.number = number;
   	$scope.name = name;
   	troll.get_suggestions($scope);
+    setTimeout(function(){ $ionicScrollDelegate.scrollBottom(true); }, 1000);
   	$state.go('chat');
     }
     
-    $scope.sendMessage = function(where) {
+    $scope.sendMessage = function() {
   	  troll.send_message($scope.messageToSend, $scope.number, $scope.name, uuid, sendSMS);
-  		$state.go(where);
+      setTimeout(function(){ $ionicScrollDelegate.scrollBottom(true); }, 1000);
+      troll.get_suggestions($scope);
     }
     
   });
